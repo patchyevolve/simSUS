@@ -12,6 +12,7 @@ Controls:
     , / .               Decrease / increase time warp
     A                   Open add-object menu
     F                   Follow selected body
+    C                   Clear all orbit trails
     R                   Reset to solar system
     1 / 2 / 3           Load preset (solar system / binary star / figure-8)
     S                   Save state to save.json
@@ -175,6 +176,10 @@ def _handle_key(key: int, sim: Simulation, camera: Camera,
         sim.reset()
         camera.reset()
         hud.push_notification("Solar System reset", duration=2.0)
+
+    elif key == pygame.K_c:
+        sim.clear_trails()
+        hud.push_notification("Orbit trails cleared", duration=1.5)
 
     elif key == pygame.K_1:
         sim.load_preset("solar_system")
