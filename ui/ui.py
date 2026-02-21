@@ -8,7 +8,6 @@ Draws on top of the renderer each frame:
   • Notifications: collision messages that fade out
 """
 from __future__ import annotations
-import math
 import time as _time
 
 import pygame
@@ -46,6 +45,7 @@ class Notification:
     def __init__(self, msg: str, duration: float = 3.0, color: tuple = (255, 220, 80)) -> None:
         self.msg = msg
         self.color = color
+        self.duration = duration
         self.expire_at = _time.time() + duration
 
 
@@ -168,7 +168,6 @@ class HUD:
             period = body.orbital_period_around(star)
             dist_au = body.distance_to(star) / 1.496e11
             if period:
-                period_days = period / 86400
                 lines.append((f"  Dist: {dist_au:.3f} AU", (200, 200, 255)))
                 lines.append((f"  Period: {_fmt_time(period)}", (200, 200, 255)))
 
@@ -202,9 +201,9 @@ class HUD:
         self._notifications = [n for n in self._notifications if n.expire_at > now]
         y = self.TOP_H + 10
         for notif in self._notifications:
-            age = 1.0 - (notif.expire_at - now) / 3.0
+            age = 1.0 - (notif.expire_at - now) / notif.duration
             alpha = int(255 * max(0, 1.0 - age))
-            r, g, b = notif.color
-            s = self.font_md.render(notif.msg, True, (r, g, b, alpha))
+            s = self.font_md.render(notif.msg, True, notif.color)
+            s.set_alpha(alpha)
             self.screen.blit(s, (10, y))
             y += 20

@@ -95,26 +95,27 @@ class AddObjectMenu:
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self._in_panel(mx, my):
+                if self._in_mass_slider(mx, my):
+                    self._dragging_slider = "mass"
+                    return True
+                if self._in_radius_slider(mx, my):
+                    self._dragging_slider = "radius"
+                    return True
                 self._handle_panel_click(mx, my)
                 return True
-            elif self.placing:
+            if self.placing:
                 # Place the body at the clicked world position
                 world_pos = camera.screen_to_world(mx, my)
-                self._place_body(world_pos, camera)
+                self._place_body(world_pos)
                 self.placing = False
                 return True
-
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            if self._in_mass_slider(my):
-                self._dragging_slider = "mass"
-            elif self._in_radius_slider(my):
-                self._dragging_slider = "radius"
 
         if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             self._dragging_slider = None
 
         if event.type == pygame.MOUSEMOTION and self._dragging_slider:
-            rel_x = (mx - (self.PANEL_X + 10)) / (self.PANEL_W - 20)
+            motion_x = event.pos[0]
+            rel_x = (motion_x - (self.PANEL_X + 10)) / (self.PANEL_W - 20)
             rel_x = max(0.0, min(1.0, rel_x))
             if self._dragging_slider == "mass":
                 self.mass_log_norm = rel_x
@@ -128,13 +129,17 @@ class AddObjectMenu:
         return (self.PANEL_X <= mx <= self.PANEL_X + self.PANEL_W
                 and self.PANEL_Y <= my <= self.PANEL_Y + self.PANEL_H)
 
-    def _in_mass_slider(self, my) -> bool:
+    def _in_mass_slider(self, mx, my) -> bool:
         sy = self.PANEL_Y + 175
-        return abs(my - sy) < 10
+        track_x = self.PANEL_X + 10
+        track_w = self.PANEL_W - 20
+        return track_x <= mx <= track_x + track_w and abs(my - sy) < 10
 
-    def _in_radius_slider(self, my) -> bool:
+    def _in_radius_slider(self, mx, my) -> bool:
         sy = self.PANEL_Y + 225
-        return abs(my - sy) < 10
+        track_x = self.PANEL_X + 10
+        track_w = self.PANEL_W - 20
+        return track_x <= mx <= track_x + track_w and abs(my - sy) < 10
 
     def _handle_panel_click(self, mx, my) -> None:
         # Type selector buttons  (row of buttons at top of panel)
@@ -152,14 +157,15 @@ class AddObjectMenu:
 
         # "Place" button
         place_btn_y = self.PANEL_Y + self.PANEL_H - 35
-        if self.PANEL_X + 10 <= mx <= self.PANEL_X + self.PANEL_W - 10 and place_btn_y <= my:
+        if (self.PANEL_X + 10 <= mx <= self.PANEL_X + self.PANEL_W - 10
+                and place_btn_y <= my <= place_btn_y + 28):
             self.placing = True
 
     # ------------------------------------------------------------------ #
     #  Place body in simulation                                             #
     # ------------------------------------------------------------------ #
 
-    def _place_body(self, world_pos: Vector2D, camera) -> None:
+    def _place_body(self, world_pos: Vector2D) -> None:
         btype = self.body_type
         mass = self.mass
         radius = self.radius
