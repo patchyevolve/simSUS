@@ -187,7 +187,7 @@ class HUD:
         bar.fill((10, 10, 30, 180))
         self.screen.blit(bar, (0, self.H - self.BOT_H))
         hints = (
-            "[SPACE] Pause  [,/.] Warp  [A] Add  [F] Follow  "
+            "[SPACE] Pause  [,/.] Warp  [A] Add  [F] Follow  [C] Clear trails  "
             "[R] Reset  [1/2/3] Preset  [S] Save  [L] Load  [ESC] Quit"
         )
         s = self.font_sm.render(hints, True, (140, 140, 170))

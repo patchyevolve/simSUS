@@ -272,6 +272,11 @@ class Simulation:
         """Reload the default solar system preset."""
         self.load_preset("solar_system")
 
+    def clear_trails(self) -> None:
+        """Clear the recorded orbit trail for every body."""
+        for body in self.bodies:
+            body.clear_trail()
+
     # ──────────────────────────────────────────────────────────────────────────
     #  Save / Load
     # ──────────────────────────────────────────────────────────────────────────
